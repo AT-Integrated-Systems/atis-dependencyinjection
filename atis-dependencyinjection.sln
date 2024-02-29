@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atis.DependencyInjection", "Atis.DependencyInjection\Atis.DependencyInjection.csproj", "{47B3A662-2FCE-4EAB-B703-A2E8D6619CFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47B3A662-2FCE-4EAB-B703-A2E8D6619CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47B3A662-2FCE-4EAB-B703-A2E8D6619CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47B3A662-2FCE-4EAB-B703-A2E8D6619CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47B3A662-2FCE-4EAB-B703-A2E8D6619CFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D905ABF-9DFF-4025-8E9A-9119543ABDF1}
+	EndGlobalSection
+EndGlobal

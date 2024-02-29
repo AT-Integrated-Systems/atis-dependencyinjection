@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Title>Atis Dependency Injection</Title>
+		<Version>1.0.0</Version>
+		<Authors>AT Integrated Systems</Authors>
+		<Company>AT Integrated Systems</Company>
+		<Product>Atis Dependency Injection</Product>
+		<Description>Atis Dependency Injection provides helper classes for the depenency injection in various Atis libraries.</Description>
+		<Copyright>Copyright (c) AT Integrated Systems</Copyright>
+		<PackageTags>Dependency Injection, Atis</PackageTags>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>attach.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+resources:
+ repositories:
+   - repository: rep1
+     type: git
+     name: 'Atis'
+
+pool:
+  name: 'Azure Pipelines'
+  vmImage: 'windows-latest'
+
+trigger: none
+
+name: 1.0.$(Rev:r)
+
+extends:
+  template: MasterBuildPipelineTemplate.yml@rep1

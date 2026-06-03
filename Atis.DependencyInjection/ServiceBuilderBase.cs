@@ -1,35 +1,32 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Data;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace Atis.DependencyInjection
 {
     /// <summary>
     ///     <para>
-    ///         Provides a convenient way to add services to the <see cref="IServiceCollection"/>.
+    ///         Provides a base implementation for registering services into an <see cref="IServiceCollection"/>.
+    ///         Inherit from this class to define the core services your component requires and how they are registered.
     ///     </para>
     /// </summary>
     public abstract class ServiceBuilderBase
     {
         /// <summary>
         ///     <para>
-        ///         Gets the <see cref="IServiceCollection"/> to add services to.
+        ///         Gets the <see cref="IServiceCollection"/> that services are registered into.
         ///     </para>
         /// </summary>
         protected IServiceCollection ServiceCollection { get; }
 
         /// <summary>
         ///     <para>
-        ///         Creates a new instance of <see cref="ServiceBuilderBase"/>.
+        ///         Initializes a new instance of <see cref="ServiceBuilderBase"/>.
         ///     </para>
         /// </summary>
-        /// <param name="serviceCollection"><see cref="IServiceCollection"/> to add services to.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <param name="serviceCollection"><see cref="IServiceCollection"/> to register services into.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceCollection"/> is <c>null</c>.</exception>
         public ServiceBuilderBase(IServiceCollection serviceCollection)
         {
             this.ServiceCollection = serviceCollection ?? throw new ArgumentNullException(nameof(serviceCollection));
@@ -37,42 +34,50 @@ namespace Atis.DependencyInjection
 
         /// <summary>
         ///     <para>
-        ///         Gets the <see cref="ServiceCharacteristic"/> for the specified service type.
+        ///         Returns the <see cref="ServiceCharacteristic"/> for the specified service type.
+        ///     </para>
+        ///     <para>
+        ///         Implement this method to describe the lifetime and registration behavior of each
+        ///         service type your builder is responsible for.
         ///     </para>
         /// </summary>
-        /// <param name="serviceType"><see cref="Type"/> of the service.</param>
-        /// <returns><see cref="ServiceCharacteristic"/> for the specified service type.</returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        protected virtual ServiceCharacteristic GetServiceInfo(Type serviceType)
-        {
-            if (!CoreServices.TryGetValue(serviceType, out var serviceCharacteristic))
-                throw new InvalidOperationException($"ServiceCharacteristic is not defined for Service type '{serviceType}'");
-
-            return serviceCharacteristic;
-        }
+        /// <param name="serviceType"><see cref="Type"/> of the service to retrieve characteristics for.</param>
+        /// <returns><see cref="ServiceCharacteristic"/> describing the lifetime and registration behavior of the service.</returns>
+        protected abstract ServiceCharacteristic GetServiceCharacteristic(Type serviceType);
 
         /// <summary>
         ///     <para>
-        ///         Gets the <see cref="ServiceCharacteristic"/> for the specified service type.
+        ///         Returns all service types that this builder is responsible for registering.
+        ///     </para>
+        ///     <para>
+        ///         The types returned here are used by <see cref="ValidateCoreServicesAdded"/> to verify
+        ///         that all required services have been registered into the <see cref="IServiceCollection"/>.
         ///     </para>
         /// </summary>
-        public abstract IDictionary<Type, ServiceCharacteristic> CoreServices { get; }
+        /// <returns>A read-only collection of service <see cref="Type"/> instances this builder owns.</returns>
+        protected abstract IReadOnlyCollection<Type> GetCoreServiceTypes();
+
         /// <summary>
         ///     <para>
-        ///         Adds the core services to the <see cref="IServiceCollection"/>.
+        ///         Registers all core services into the <see cref="IServiceCollection"/>.
+        ///     </para>
+        ///     <para>
+        ///         Implement this method to call <see cref="TryAdd(Type, Type)"/> or
+        ///         <see cref="TryAdd(Type, Func{IServiceProvider, object})"/> for each service
+        ///         your component requires.
         ///     </para>
         /// </summary>
         public abstract void AddCoreServices();
 
         /// <summary>
         ///     <para>
-        ///         Tries to add the specified service type and implementation type to the <see cref="IServiceCollection"/>, 
+        ///         Tries to add the specified service type and implementation type to the <see cref="IServiceCollection"/>,
         ///         does nothing if the service type is already registered.
         ///     </para>
         /// </summary>
         /// <param name="serviceType"><see cref="Type"/> of the service.</param>
         /// <param name="implementationType"><see cref="Type"/> of the implementation.</param>
-        /// <returns><see cref="ServiceBuilderBase"/> instance for chaining.</returns>
+        /// <returns>The current <see cref="ServiceBuilderBase"/> instance for chaining.</returns>
         public virtual ServiceBuilderBase TryAdd(Type serviceType, Type implementationType)
             => InternalTryAdd(serviceType, implementationType, null);
 
@@ -83,22 +88,22 @@ namespace Atis.DependencyInjection
         ///     </para>
         /// </summary>
         /// <param name="serviceType"><see cref="Type"/> of the service.</param>
-        /// <param name="implementationFactory">Function that returns the implementation.</param>
-        /// <returns><see cref="ServiceBuilderBase"/> instance for chaining.</returns>
+        /// <param name="implementationFactory">Factory function that creates the service implementation.</param>
+        /// <returns>The current <see cref="ServiceBuilderBase"/> instance for chaining.</returns>
         public virtual ServiceBuilderBase TryAdd(Type serviceType, Func<IServiceProvider, object> implementationFactory)
             => InternalTryAdd(serviceType, null, implementationFactory);
-        
+
         /// <summary>
         ///     <para>
         ///         Tries to add the specified service type and implementation type to the <see cref="IServiceCollection"/>,
         ///         does nothing if the service type is already registered.
         ///     </para>
         /// </summary>
-        /// <typeparam name="IServiceType">Type of the service.</typeparam>
-        /// <typeparam name="IImplementationType">Type of the implementation.</typeparam>
-        /// <returns><see cref="ServiceBuilderBase"/> instance for chaining.</returns>
-        public virtual ServiceBuilderBase TryAdd<IServiceType, IImplementationType>()
-            => this.TryAdd(typeof(IServiceType), typeof(IImplementationType));
+        /// <typeparam name="TService">Type of the service.</typeparam>
+        /// <typeparam name="TImplementation">Type of the implementation.</typeparam>
+        /// <returns>The current <see cref="ServiceBuilderBase"/> instance for chaining.</returns>
+        public virtual ServiceBuilderBase TryAdd<TService, TImplementation>()
+            => this.TryAdd(typeof(TService), typeof(TImplementation));
 
         /// <summary>
         ///     <para>
@@ -106,45 +111,45 @@ namespace Atis.DependencyInjection
         ///         does nothing if the service type is already registered.
         ///     </para>
         /// </summary>
-        /// <typeparam name="IServiceType">Type of the service.</typeparam>
-        /// <param name="implementationFactory">Function that returns the implementation.</param>
-        /// <returns><see cref="ServiceBuilderBase"/> instance for chaining.</returns>
-        public virtual ServiceBuilderBase TryAdd<IServiceType>(Func<IServiceProvider, object> implementationFactory)
-            => this.TryAdd(typeof(IServiceType), implementationFactory);
+        /// <typeparam name="TService">Type of the service.</typeparam>
+        /// <param name="implementationFactory">Factory function that creates the service implementation.</param>
+        /// <returns>The current <see cref="ServiceBuilderBase"/> instance for chaining.</returns>
+        public virtual ServiceBuilderBase TryAdd<TService>(Func<IServiceProvider, object> implementationFactory)
+            => this.TryAdd(typeof(TService), implementationFactory);
 
         /// <summary>
         ///     <para>
-        ///         Core method to add the specified service type and implementation type or implementation factory to the <see cref="IServiceCollection"/>.
+        ///         Validates that all service types returned by <see cref="GetCoreServiceTypes"/> have been
+        ///         registered into the <see cref="IServiceCollection"/>.
         ///     </para>
         /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         At-least one of the <paramref name="implementationType"/> or <paramref name="implementationFactory"/> must be provided,
-        ///         otherwise an <see cref="ArgumentNullException"/> will be thrown.
-        ///     </para>
-        ///     <para>
-        ///         Throws <see cref="ArgumentNullException"/> if <paramref name="serviceType"/> is null.
-        ///     </para>
-        /// </remarks>
-        /// <param name="serviceType">Type of the service.</param>
-        /// <param name="implementationType">Type of the implementation.</param>
-        /// <param name="implementationFactory">Function that returns the implementation.</param>
-        /// <returns><see cref="ServiceBuilderBase"/> instance for chaining.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        protected virtual ServiceBuilderBase InternalTryAdd(Type serviceType, Type implementationType, Func<IServiceProvider, object> implementationFactory)
+        /// <exception cref="CoreServicesNotInitializedException">
+        ///     Thrown when one or more core service types have not been registered.
+        /// </exception>
+        public void ValidateCoreServicesAdded()
+        {
+            var coreServiceTypes = this.GetCoreServiceTypes();
+            var servicesNotAdded = coreServiceTypes
+                .Where(x => !this.ServiceCollection.Any(y => x == y.ServiceType))
+                .ToArray();
+            if (servicesNotAdded.Length > 0)
+                throw new CoreServicesNotInitializedException(servicesNotAdded);
+        }
+
+        private ServiceBuilderBase InternalTryAdd(Type serviceType, Type implementationType, Func<IServiceProvider, object> implementationFactory)
         {
             if (serviceType is null)
                 throw new ArgumentNullException(nameof(serviceType));
             if (implementationType is null && implementationFactory is null)
-                throw new ArgumentNullException($"Both '{nameof(implementationType)}' and '{nameof(implementationFactory)}' arguments are null, at-least one of them must be provided");
+                throw new ArgumentException($"At least one of '{nameof(implementationType)}' or '{nameof(implementationFactory)}' must be provided.");
 
-            var serviceCharacteristic = this.GetServiceInfo(serviceType);
+            var serviceCharacteristic = this.GetServiceCharacteristic(serviceType);
 
             if (
-                (serviceCharacteristic.AllowMultiple && !this.HasImplementationRegistered(serviceType, implementationType, implementationFactory))
+                (serviceCharacteristic.AllowMultiple && !HasImplementationRegistered(serviceType, implementationType, implementationFactory))
                 ||
-                (!serviceCharacteristic.AllowMultiple && !this.HasServiceRegistered(serviceType))
-                )
+                (!serviceCharacteristic.AllowMultiple && !HasServiceRegistered(serviceType))
+               )
                 if (implementationType != null)
                     this.ServiceCollection.Add(new ServiceDescriptor(serviceType, implementationType, serviceCharacteristic.Lifetime));
                 else
@@ -153,52 +158,17 @@ namespace Atis.DependencyInjection
             return this;
         }
 
-        /// <summary>
-        ///     <para>
-        ///         Determines whether the specified service type is already registered in the <see cref="IServiceCollection"/>.
-        ///     </para>
-        /// </summary>
-        /// <param name="serviceType">Type of the service.</param>
-        /// <returns><c>true</c> if the service type is already registered; otherwise, <c>false</c>.</returns>
-        protected virtual bool HasServiceRegistered(Type serviceType)
+        private bool HasServiceRegistered(Type serviceType)
         {
             return this.ServiceCollection.Any(x => x.ServiceType == serviceType);
         }
 
-        /// <summary>
-        ///     <para>
-        ///         Determines whether the specified service type and implementation type or implementation factory is already registered in the <see cref="IServiceCollection"/>.
-        ///     </para>
-        /// </summary>
-        /// <param name="serviceType">Type of the service.</param>
-        /// <param name="implementationType">Type of the implementation.</param>
-        /// <param name="implementationFactory">Function that returns the implementation.</param>
-        /// <returns><c>true</c> if the service type and implementation type or implementation factory is already registered; otherwise, <c>false</c>.</returns>
-        protected virtual bool HasImplementationRegistered(Type serviceType, Type implementationType, Func<IServiceProvider, object> implementationFactory)
+        private bool HasImplementationRegistered(Type serviceType, Type implementationType, Func<IServiceProvider, object> implementationFactory)
         {
             if (implementationType != null)
                 return this.ServiceCollection.Any(x => x.ServiceType == serviceType && x.ImplementationType == implementationType);
             else
                 return this.ServiceCollection.Any(x => x.ServiceType == serviceType && x.ImplementationFactory == implementationFactory);
-        }
-
-        /// <summary>
-        ///     <para>
-        ///         Validates that all core services are added to the <see cref="IServiceCollection"/>.
-        ///     </para>
-        /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         Throws <see cref="CoreServicesNotInitializedException"/> if any of the core services are not added.
-        ///     </para>
-        /// </remarks>
-        /// <exception cref="CoreServicesNotInitializedException"></exception>
-        public void ValidateCoreServiceAdded()
-        {
-            var coreServices = this.CoreServices.Keys.ToArray();
-            var servicesNotAdded = coreServices.Where(x => !this.ServiceCollection.Any(y => x == y.ServiceType)).ToArray();
-            if (servicesNotAdded.Length > 0)
-                throw new CoreServicesNotInitializedException(servicesNotAdded);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Atis.DependencyInjection
     public class ServiceContextConfiguration : IServiceContextConfiguration
     {
         private readonly Dictionary<Type, IServiceContextExtension> _extensions = new Dictionary<Type, IServiceContextExtension>();
+
         /// <inheritdoc />
         public IEnumerable<IServiceContextExtension> Extensions => this._extensions.Values;
 

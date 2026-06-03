@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Atis.DependencyInjection
 {
     /// <summary>
     ///     <para>
-    ///         Defines a contract for adding services to the <see cref="IServiceCollection"/>.
+    ///         Defines a contract for contributing services to an
+    ///         <see cref="IServiceCollection"/> as part of a service context configuration.
     ///     </para>
     /// </summary>
     public interface IServiceContextExtension

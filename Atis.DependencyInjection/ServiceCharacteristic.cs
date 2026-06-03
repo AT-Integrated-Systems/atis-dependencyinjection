@@ -1,7 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Atis.DependencyInjection
 {
@@ -32,7 +29,7 @@ namespace Atis.DependencyInjection
         ///     </para>
         /// </summary>
         /// <param name="lifetime"><see cref="ServiceLifetime"/> of the service registration.</param>
-        /// <param name="allowMultiple">If <c>true</c> multiple service registrations are allowed.</param>
+        /// <param name="allowMultiple">If <c>true</c>, multiple registrations of the same service type are allowed.</param>
         public ServiceCharacteristic(ServiceLifetime lifetime, bool allowMultiple = false)
         {
             Lifetime = lifetime;

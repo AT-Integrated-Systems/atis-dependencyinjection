@@ -250,13 +250,33 @@ This is the class consumers will actually use. It wires everything together.
 public abstract class DataContext
 {
     private static readonly DataLibServiceManager _serviceManager = new DataLibServiceManager();
-    private IServiceProvider _serviceProvider;
+    private readonly DataContextConfiguration _config;
+    private IServiceProvider? _serviceProvider;
 
+    // No-arg constructor — chains to the overload with a default config
     protected DataContext()
+        : this(new DataContextConfiguration())
     {
-        var config = new DataContextConfiguration();
-        this.OnConfiguring(config);
-        _serviceProvider = _serviceManager.GetOrAdd(config);
+    }
+
+    // Overload for consumers who want to pass a pre-built configuration
+    protected DataContext(DataContextConfiguration config)
+    {
+        _config = config;  // just store it — nothing is built yet
+    }
+
+    // Lazy — built once on first API access, cached for all subsequent calls
+    private IServiceProvider ServiceProvider
+    {
+        get
+        {
+            if (_serviceProvider == null)
+            {
+                OnConfiguring(_config);                               // Phase 1 — runs once
+                _serviceProvider = _serviceManager.GetOrAdd(_config); // Phase 2 — build or retrieve from cache
+            }
+            return _serviceProvider;
+        }
     }
 
     // Consumers override this to configure the context
@@ -264,7 +284,7 @@ public abstract class DataContext
 
     // All API properties resolve from the same provider
     public IRepository<T> Set<T>() where T : class
-        => _serviceProvider.GetRequiredService<IRepository<T>>();
+        => ServiceProvider.GetRequiredService<IRepository<T>>();
 }
 ```
 

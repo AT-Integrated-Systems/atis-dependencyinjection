@@ -2,7 +2,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/Atis.DependencyInjection.svg)](https://www.nuget.org/packages/Atis.DependencyInjection)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Build Status](https://github.com/atintegratedsystems/atis-dependency-injection/actions/workflows/build.yml/badge.svg)](https://github.com/atintegratedsystems/atis-dependency-injection/actions)
+[![Build Status](https://github.com/AT-Integrated-Systems/atis-dependencyinjection/actions/workflows/ci.yml/badge.svg)](https://github.com/AT-Integrated-Systems/atis-dependencyinjection/actions/workflows/ci.yml)
 
 A lightweight framework for **.NET library authors** who need to manage their library's internal dependency injection while giving consumers a clean, structured way to customize or extend it.
 

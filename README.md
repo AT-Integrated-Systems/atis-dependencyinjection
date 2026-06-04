@@ -313,7 +313,13 @@ public static class DataContextConfigurationExtensions
 }
 ```
 
-Each extension class implements `IServiceContextExtension` and registers provider-specific services:
+Each extension class implements `IServiceContextExtension` and registers provider-specific services.
+
+Inside `AddServices`, you have access to both the raw `IServiceCollection` and a `ServiceBuilder` instance you can create from it. Understanding which one to use is important:
+
+**Use `ServiceBuilder` for framework services** — services that your library's `ServiceBuilderBase` knows about (i.e. they have a defined `ServiceCharacteristic`). The builder enforces the correct lifetime automatically, so the extension does not need to know whether a service should be `Transient`, `Scoped`, or `Singleton`.
+
+**Use `IServiceCollection` directly for non-framework services** — services that are specific to the extension and are not declared in your library's `ServiceBuilderBase`. For these, the extension is responsible for specifying the lifetime explicitly.
 
 ```csharp
 public class SqlServerExtension : IServiceContextExtension
@@ -329,12 +335,21 @@ public class SqlServerExtension : IServiceContextExtension
     // This is where actual DI registrations happen
     public void AddServices(IServiceCollection services)
     {
-        services.AddSingleton<IConnectionFactory>(
+        // Use ServiceBuilder for framework services — lifetime is enforced automatically
+        var serviceBuilder = new DataLibServiceBuilder(services);
+        serviceBuilder.TryAdd<IConnectionFactory>(
             _ => new SqlServerConnectionFactory(_connectionString));
-        services.AddTransient<IQueryExecutor, SqlServerQueryExecutor>();
+        serviceBuilder.TryAdd<IQueryExecutor, SqlServerQueryExecutor>();
+
+        // Use IServiceCollection directly for non-framework services —
+        // these are extension-specific and ServiceBuilderBase does not know about them,
+        // so the extension must specify the lifetime explicitly
+        services.AddSingleton<SqlServerDiagnosticsListener>();
     }
 }
 ```
+
+The key benefit of going through `ServiceBuilder` for framework services is that if the lifetime of `IQueryExecutor` ever changes in your library, the change only needs to happen in one place — `ServiceBuilderBase`. Every extension that uses `ServiceBuilder` picks it up automatically, without any code changes.
 
 ---
 
@@ -374,8 +389,10 @@ public class MyCustomExtension : IServiceContextExtension
 {
     public void AddServices(IServiceCollection services)
     {
+        // Use ServiceBuilder to override a framework service — lifetime is handled automatically
         // Registers before library defaults, so this takes precedence
-        services.AddTransient<IQueryExecutor, MyCustomQueryExecutor>();
+        var serviceBuilder = new DataLibServiceBuilder(services);
+        serviceBuilder.TryAdd<IQueryExecutor, MyCustomQueryExecutor>();
     }
 }
 

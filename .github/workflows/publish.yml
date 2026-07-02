@@ -1,9 +1,15 @@
 name: Publish to NuGet
 
+# DEPRECATED: Atis.DependencyInjection has moved to Atzonix.DependencyInjection
+# (https://github.com/atzonix/atzonix-dependency-injection). Automatic publishing is
+# DISABLED to prevent any accidental push of the retired package to NuGet. The automatic
+# tag trigger below is intentionally commented out; this workflow can only be started
+# manually via workflow_dispatch if it is ever genuinely needed.
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"   # matches v1.1.0, v2.0.0, etc.
+  workflow_dispatch:
+  # push:
+  #   tags:
+  #     - "v[0-9]+.[0-9]+.[0-9]+"   # matches v1.1.0, v2.0.0, etc.
 
 jobs:
   publish:

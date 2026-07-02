@@ -1,10 +1,15 @@
 name: CI
 
+# DEPRECATED: Atis.DependencyInjection has moved to Atzonix.DependencyInjection
+# (https://github.com/atzonix/atzonix-dependency-injection). This repository is retired,
+# so automatic CI triggers are DISABLED. The workflow can still be run manually via
+# workflow_dispatch if needed.
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+  # push:
+  #   branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
 jobs:
   build-and-test:

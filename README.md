@@ -1,5 +1,10 @@
 # Atis.DependencyInjection
 
+> ⚠️ **This package has been renamed and moved.**
+> `Atis.DependencyInjection` is no longer maintained. Please migrate to
+> [`Atzonix.DependencyInjection`](https://www.nuget.org/packages/Atzonix.DependencyInjection)
+> — see the new repo at https://github.com/atzonix/atzonix-dependency-injection.
+
 [![NuGet Version](https://img.shields.io/nuget/v/Atis.DependencyInjection.svg)](https://www.nuget.org/packages/Atis.DependencyInjection)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Build Status](https://github.com/AT-Integrated-Systems/atis-dependencyinjection/actions/workflows/ci.yml/badge.svg)](https://github.com/AT-Integrated-Systems/atis-dependencyinjection/actions/workflows/ci.yml)
@@ -76,11 +81,14 @@ public class MyDataContext : DataContext
 
 ## Installation
 
+> **This package is retired.** Install the successor package instead:
+
 ```
-dotnet add package Atis.DependencyInjection
+dotnet add package Atzonix.DependencyInjection
 ```
 
-Or via the NuGet Package Manager in Visual Studio, search for `Atis.DependencyInjection`.
+Or via the NuGet Package Manager in Visual Studio, search for `Atzonix.DependencyInjection`.
+See [github.com/atzonix/atzonix-dependency-injection](https://github.com/atzonix/atzonix-dependency-injection).
 
 ---
 

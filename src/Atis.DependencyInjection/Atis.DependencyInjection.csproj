@@ -23,6 +23,9 @@
 		<Company>AT Integrated Systems</Company>
 		<Product>Atis.DependencyInjection</Product>
 		<Description>
+			MOVED: this package is retired and replaced by Atzonix.DependencyInjection
+			(https://github.com/atzonix/atzonix-dependency-injection). Please migrate.
+
 			Lightweight extensions for Microsoft.Extensions.DependencyInjection that simplify
 			service registration patterns in .NET Standard 2.0+ applications.
 		</Description>
@@ -38,7 +41,11 @@
 		<!-- Docs / license -->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Initial public release (v1.1.0).</PackageReleaseNotes>
+		<PackageReleaseNotes>
+			RETIRED. Atis.DependencyInjection has moved to Atzonix.DependencyInjection
+			(https://github.com/atzonix/atzonix-dependency-injection). This package is no
+			longer maintained or published from this repository.
+		</PackageReleaseNotes>
 
 		<!-- Source Link / deterministic -->
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
